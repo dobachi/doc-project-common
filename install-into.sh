@@ -64,6 +64,16 @@ for d in "${targets[@]}"; do
   [ "$has_tgt" = yes ] && say "Makefile : check-env は既にある" || say "Makefile : check-env を追記する"
   [ "$has_old" = yes ] && say "同梱の scripts/check-env.sh: 削除する"
 
+  # 旧い同梱スクリプトを消すのに Makefile が既にそれを指している場合、
+  # ターゲットを書き換えないと「消したファイルを呼ぶ」壊れた状態になる。
+  # 自動では直さず、手当てが要ることを明示して飛ばす。
+  if [ "$has_old" = yes ] && [ "$has_tgt" = yes ] && \
+     grep -qE '^\s+@?bash scripts/check-env\.sh' "$d/Makefile"; then
+    say "飛ばす: Makefile の check-env が同梱スクリプトを指している。"
+    say "        scripts/common/check-env.sh を指すよう直してから再実行すること"
+    continue
+  fi
+
   if [ "$MODE" = dry ]; then continue; fi
 
   ( cd "$d" || exit 1
