@@ -1,0 +1,47 @@
+---
+# Quarto でドキュメント (レポート・論文・スライド) を書くための環境を一式入れる。
+# Debian / Ubuntu 向け。それ以外の OS は README.md の「手で入れる場合」を参照。
+#
+# 入るもの:
+#   quarto         Quarto 本体 (upstream の .deb)
+#   texlive        PDF 出力用の TeX Live 一式 + 日本語 (luatex-ja, Noto CJK)
+#   japanese_fonts 日本語フォント
+#   nodejs         node/npm (mermaid_cli の前提)
+#   mermaid_cli    mmdc。Mermaid 図 → SVG
+#   svg_pdf_tools  rsvg-convert (SVG→PDF)、poppler-utils (PDF→テキスト)
+#
+# 順序に意味がある: nodejs → mermaid_cli (npm global を使うため)。
+#
+# 実行例 (このディレクトリで。ansible.cfg と inventory を読む):
+#   # このマシンに入れる
+#   ansible-playbook doc_authoring.yml -K
+#
+#   # 一部だけ入れ直す (タグで絞る)
+#   ansible-playbook doc_authoring.yml -K --tags mermaid_cli
+#
+#   # Quarto の版を変える
+#   ansible-playbook doc_authoring.yml -K -e quarto_version=1.10.3
+#
+#   # 別のマシンに入れる (自分の inventory を渡す)
+#   ansible-playbook -i <inventory> doc_authoring.yml -e server=<ホスト> -K
+#
+# 注意:
+#   - PDF 環境は texlive ロールに寄せている。`quarto install tinytex` は
+#     **併用しないこと**。TeX の導入経路が二重になり、パッケージ探索と
+#     フォント解決が食い違って「このマシンでは通るが別マシンで落ちる」状態を作る。
+#   - nodejs ロールは `n i stable` で最新安定版を入れる (版を固定していない)。
+#     mermaid-cli は node の版に敏感なので、動かなくなったらまずここを疑う。
+#   - 導入後の確認は、コマンドの有無ではなく実際にビルドが通るかで見ること。
+#     このリポジトリの check-env.sh を使う。
+
+- hosts: "{{ server | default('localhost') }}"
+  become: yes
+  roles:
+    - quarto
+    - texlive
+    - japanese_fonts
+    - nodejs
+    - mermaid_cli
+    - svg_pdf_tools
+
+# vim: et ts=2 sw=2:

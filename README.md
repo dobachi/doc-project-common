@@ -12,11 +12,13 @@ submodule なら**取り込んだコミットが固定される**ので、意図
 | ファイル | 役割 |
 |:---|:---|
 | `check-env.sh` | 環境チェック。不足を列挙し、終了コードで返す |
+| `install-tools.sh` | ツール一式を入れる（Debian / Ubuntu 向け。中身は `ansible/`） |
+| `ansible/` | ツール導入の playbook とロール。ほかの OS 向けの一覧も [`ansible/README.md`](ansible/README.md) にある |
 
 ## 契約（この3つの名前が揃っていれば、どのプロジェクトでも同じ手順になる）
 
-1. **ツールの導入** — [ansible-miscs](https://github.com/dobachi/ansible-miscs) の
-   `playbooks/conf/linux/doc_authoring.yml`（マシンごとに一度）
+1. **ツールの導入** — `bash scripts/common/install-tools.sh`（マシンごとに一度。
+   Debian / Ubuntu 向け。ほかの OS は [`ansible/README.md`](ansible/README.md) の一覧を見て入れる）
 2. **`make check-env`** — 揃ったかを確認する
 3. **`scripts/env.conf`** — プロジェクト固有の事情を宣言する（無ければ置かない）
 

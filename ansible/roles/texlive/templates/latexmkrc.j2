@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+# Defaults for Japanese / English paper writing.
+# Build chain: uplatex -> dvipdfmx (recommended for jp papers; embeds CJK
+# fonts as configured by `kanji-config-updmap-sys`).
+
+$latex     = 'uplatex %O -synctex=1 -interaction=nonstopmode %S';
+$bibtex    = 'upbibtex %O %B';
+$biber     = 'biber %O %B';
+$dvipdf    = 'dvipdfmx %O -o %D %S';
+$makeindex = 'upmendex %O -o %D %S';
+
+# pdf_mode:
+#   1 = pdflatex direct
+#   3 = latex -> dvi -> pdf (uses $dvipdf, here remapped to dvipdfmx)
+#   4 = lualatex direct
+#   5 = xelatex direct
+$pdf_mode = 3;

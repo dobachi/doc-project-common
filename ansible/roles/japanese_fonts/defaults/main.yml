@@ -1,0 +1,29 @@
+---
+# defaults file for roles/japanese_fonts
+#
+# 日本語フォントパッケージ一式。OnlyOffice / LibreOffice / Inkscape /
+# ブラウザなど、システムの fontconfig を参照するアプリから直接利用できる。
+#
+# - Noto CJK: モダンな既定フォント (Sans / Serif, 4 ウェイト)
+# - IPA / IPAex: 公的書類で要求されることが多い
+# - Takao: MS Gothic / MS Mincho の代替として扱いやすい
+# - VLGothic / M+ / Hanazono / Migmix: 補助カバレッジ (Hanazono は CJK 拡張漢字)
+#
+# 不要なものはホスト変数や -e で空配列を渡して上書き可能。
+japanese_fonts_packages:
+  - fonts-noto-cjk
+  - fonts-noto-cjk-extra
+  - fonts-ipafont
+  - fonts-ipafont-mincho
+  - fonts-ipafont-gothic
+  - fonts-ipaexfont
+  - fonts-ipaexfont-mincho
+  - fonts-ipaexfont-gothic
+  - fonts-takao
+  - fonts-takao-mincho
+  - fonts-takao-gothic
+  - fonts-takao-pgothic
+  - fonts-vlgothic
+  - fonts-mplus
+  - fonts-hanazono
+  - fonts-migmix

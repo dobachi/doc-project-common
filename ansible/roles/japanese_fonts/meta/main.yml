@@ -1,0 +1,12 @@
+galaxy_info:
+  author: dobachi
+  description: Install Japanese font set (Noto CJK / IPA / IPAex / Takao etc.) for office and GUI apps
+  license: Apache-2.0
+  min_ansible_version: 2.9
+  galaxy_tags:
+    - japanese
+    - fonts
+    - cjk
+    - desktop
+
+dependencies: []

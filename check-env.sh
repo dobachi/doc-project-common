@@ -44,11 +44,10 @@ ok()   { printf "  \033[32mOK\033[0m   %-26s %s\n" "$1" "${2:-}"; }
 warn() { printf "  \033[33mWARN\033[0m %-26s %s\n" "$1" "${2:-}"; }
 bad()  { printf "  \033[31mNG\033[0m   %-26s %s\n" "$1" "${2:-}"; ng=$((ng+1)); }
 
-# ツールの導入はマシン単位で ansible に寄せてある。
-#   git clone https://github.com/dobachi/ansible-miscs
-#   cd ansible-miscs && ansible-playbook -i hosts \
-#     playbooks/conf/linux/doc_authoring.yml -e server=localhost --connection=local -K
-FIX="ansible-miscs の doc_authoring.yml を実行（SETUP.md 参照）"
+# ツールの導入はマシン単位で ansible に寄せてある（このリポジトリの ansible/）。
+#   bash scripts/common/install-tools.sh        Debian / Ubuntu
+# ほかの OS は ansible/README.md の「手で入れる場合」を見て入れる。
+FIX="bash scripts/common/install-tools.sh で入る（Debian / Ubuntu 以外は scripts/common/ansible/README.md の一覧）"
 
 # --- 何が必要かを判定する ---------------------------------------------------
 uses_mmdc=no

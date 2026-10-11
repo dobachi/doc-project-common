@@ -1,0 +1,51 @@
+---
+# tasks file for roles/texlive
+#
+# Debian/Ubuntu の apt から TeX Live を導入する。upstream の install-tl は
+# 使わない (Ubuntu 26 の同梱版は TeX Live 2024 系で十分新しいため)。
+
+- block:
+    - name: Install TeX Live (English / general packages)
+      ansible.builtin.apt:
+        name: "{{ texlive_base_packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install TeX Live (Japanese packages)
+      ansible.builtin.apt:
+        name: "{{ texlive_japanese_packages }}"
+        state: present
+      when: texlive_install_japanese | bool
+
+    - name: Set system-wide Japanese font preset for dvipdfmx / luatex-ja
+      ansible.builtin.command:
+        cmd: "kanji-config-updmap-sys --{{ texlive_japanese_font_variant }} {{ texlive_japanese_font_preset }}"
+      register: _texlive_kanji_updmap
+      changed_when: >-
+        ('updmap' in (_texlive_kanji_updmap.stdout | lower))
+        or ('kanjiembed' in (_texlive_kanji_updmap.stdout | lower)
+            and 'current_kanjiembed = ' ~ texlive_japanese_font_preset
+                not in (_texlive_kanji_updmap.stdout | lower))
+      when:
+        - texlive_install_japanese | bool
+        - texlive_configure_japanese_font | bool
+
+    # ~/.latexmkrc を配備するユーザは playbook 実行ユーザを既定とする。
+    # root 直接実行や SUDO_USER が空の場合は配らない (root 用の ~/.latexmkrc は
+    # 不要なケースが大半なので)。
+    - name: Deploy default ~/.latexmkrc for paper-writing workflow
+      ansible.builtin.template:
+        src: latexmkrc.j2
+        dest: "{{ texlive_target_home }}/.latexmkrc"
+        owner: "{{ texlive_target_user }}"
+        group: "{{ texlive_target_user }}"
+        mode: "0644"
+        force: false
+      when:
+        - texlive_install_user_latexmkrc | bool
+        - texlive_target_user | length > 0
+        - texlive_target_user != 'root'
+
+  tags:
+    - texlive

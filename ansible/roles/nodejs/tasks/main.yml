@@ -1,0 +1,31 @@
+---
+# tasks file for roles/nodejs
+- block:
+  - name: install nodejs and npm
+    apt:
+      name:
+       - nodejs
+       - npm
+      state: present
+  - name: npm install n
+    npm:
+      name: n
+      state: present
+      global: yes
+  - name: change version of n
+    shell: |
+      n i stable
+  - name: npm install n
+    npm:
+      name: n
+      state: present
+      global: yes
+  - name: install nodejs and npm
+    apt:
+      name:
+       - nodejs
+       - npm
+      state: absent
+    
+  tags:
+    - nodejs

@@ -1,0 +1,56 @@
+---
+# defaults file for roles/texlive
+#
+# 英語 + 日本語の論文執筆環境を Debian/Ubuntu の apt パッケージで揃える。
+# upstream の install-tl は使わず、distro 同梱版に統一。
+
+# ---- 英語論文向けの基本パッケージ -----------------------------------
+texlive_base_packages:
+  - texlive-latex-recommended
+  - texlive-latex-extra
+  - texlive-fonts-recommended
+  - texlive-fonts-extra
+  - texlive-bibtex-extra
+  - biber
+  - texlive-science      # amsmath/amssymb 拡張、SIunits 等
+  - texlive-pictures     # TikZ, PGFPlots
+  - texlive-publishers   # IEEE/ACM/Springer 等の学会クラス
+  - texlive-luatex
+  - texlive-xetex
+  - texlive-extra-utils  # latexindent, pdfcrop, etc.
+  - latexmk
+
+# ---- 日本語環境 ----------------------------------------------------
+texlive_install_japanese: true
+texlive_japanese_packages:
+  - texlive-lang-japanese  # pTeX/upTeX/pLaTeX/upLaTeX/luatex-ja
+  - fonts-noto-cjk
+  - fonts-noto-cjk-extra
+
+# `kanji-config-updmap-sys` でシステム既定の和文フォントを設定する。
+# false にするとフォント切替は手動 (各ユーザの kanji-config-updmap-user 等)。
+texlive_configure_japanese_font: true
+
+# 使用するフォントプリセット。Ubuntu 26 / TeX Live 2024 の主な値:
+#   ipaex, ipa, noto, noto-otc, hiragino-pron, kozuka-pron, ms, yu-win10, ...
+# fonts-noto-cjk が入っていれば noto-otc が一番ハイクオリティ。
+texlive_japanese_font_preset: "noto-otc"
+
+# JIS 規格バリアント: jis2004 (デフォルト) または jis90
+texlive_japanese_font_variant: "jis2004"
+
+# ---- ユーザ単位の latexmkrc 配備 ------------------------------------
+# `latexmk` を `uplatex -> dvipdfmx` (日本語論文の標準ルート) にしておく
+# 既定の ~/.latexmkrc を、playbook を実行したユーザのホームに置く。
+# 既存の ~/.latexmkrc がある場合は壊さない (force: false)。
+texlive_install_user_latexmkrc: true
+
+# 配備先ユーザ。SUDO_USER (sudo 経由実行時) を優先し、無ければ実行ユーザを使う。
+# リモート実行や別ユーザ向けに配りたい場合は明示的に上書きしてください。
+texlive_target_user: "{{ ansible_facts.env.SUDO_USER | default(lookup('env', 'USER'), true) }}"
+
+# 配備先ホームディレクトリ。register_home ロールが先に走っていれば
+# ansible_home が使われる。スタンドアロン実行時は /home/<user> にフォールバック。
+texlive_target_home: >-
+  {{ ansible_home
+     | default('/home/' ~ texlive_target_user, true) }}

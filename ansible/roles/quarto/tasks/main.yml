@@ -1,0 +1,32 @@
+---
+# tasks file for roles/quarto
+#
+# Debian/Ubuntu に upstream の Quarto .deb を導入する。
+# その他の OS では何もしない (when ガードで skip)。
+
+- block:
+
+    - name: Detect installed Quarto version (if any)
+      ansible.builtin.command: quarto --version
+      register: _quarto_installed
+      changed_when: false
+      failed_when: false
+
+    - name: Download Quarto .deb (skipped if requested version already installed)
+      ansible.builtin.get_url:
+        url: "{{ quarto_release_base_url }}/v{{ quarto_version }}/quarto-{{ quarto_version }}-linux-{{ quarto_deb_arch }}.deb"
+        dest: "{{ quarto_deb_download_dir }}/quarto-{{ quarto_version }}-linux-{{ quarto_deb_arch }}.deb"
+        mode: "0644"
+      when: _quarto_installed.rc != 0 or (_quarto_installed.stdout | trim) != quarto_version
+
+    - name: Install Quarto .deb
+      ansible.builtin.apt:
+        deb: "{{ quarto_deb_download_dir }}/quarto-{{ quarto_version }}-linux-{{ quarto_deb_arch }}.deb"
+        state: present
+      when: _quarto_installed.rc != 0 or (_quarto_installed.stdout | trim) != quarto_version
+
+  tags:
+    - quarto
+  when: ansible_facts['os_family'] == "Debian"
+
+# vim: set et ts=2 sw=2:

@@ -1,0 +1,13 @@
+---
+# defaults file for roles/svg_pdf_tools
+#
+# SVG/PDF を扱うコマンドライン変換ユーティリティ一式。
+# Quarto でドキュメントをビルドする際、図と PDF まわりで必要になる。
+
+svg_pdf_tools_packages:
+  # rsvg-convert: SVG を PDF/PNG に変換する。Quarto の PDF ビルドで
+  # SVG 図を取り込むのに必須。無いと図が欠落する。
+  - librsvg2-bin
+  # pdftotext / pdftoppm / pdfinfo: PDF からテキストや画像を取り出す。
+  # 引用元 PDF との逐語照合や、生成した PDF の目視確認に使う。
+  - poppler-utils

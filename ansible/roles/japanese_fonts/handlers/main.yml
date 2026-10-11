@@ -1,0 +1,4 @@
+---
+# handlers file for roles/japanese_fonts
+- name: refresh fontconfig cache
+  command: fc-cache -f

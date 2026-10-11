@@ -1,0 +1,19 @@
+---
+# tasks file for roles/svg_pdf_tools
+#
+# apt で入るものだけ。その他の OS では何もしない (when ガードで skip)。
+
+- block:
+
+    - name: Install SVG/PDF conversion tools
+      ansible.builtin.apt:
+        name: "{{ svg_pdf_tools_packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+  tags:
+    - svg_pdf_tools
+  when: ansible_facts['os_family'] == "Debian"
+
+# vim: set et ts=2 sw=2:

@@ -1,0 +1,24 @@
+---
+# defaults file for roles/quarto
+#
+# Quarto は upstream の .deb を入れる。Debian/Ubuntu の apt 同梱版は
+# 古いか存在しないため、GitHub Releases から取得する方針で統一する。
+
+# 導入する Quarto のバージョン (GitHub Releases のタグから "v" を除いたもの)。
+# 2026-05 時点の安定版は 1.9.37。Pre-release 系 (1.10.x) を入れたい場合は
+# -e quarto_version=1.10.3 のように上書きする。
+quarto_version: "1.9.37"
+
+# .deb のダウンロード元 URL。
+# {{ quarto_version }} と {{ quarto_deb_arch }} で組み立てる。
+quarto_release_base_url: "https://github.com/quarto-dev/quarto-cli/releases/download"
+
+# Quarto が配布するアーキテクチャ表記 (Debian の dpkg architecture とは異なる)。
+#   x86_64  -> amd64
+#   aarch64 -> arm64
+quarto_deb_arch: >-
+  {{ 'arm64' if ansible_facts['architecture'] in ['aarch64', 'arm64']
+     else 'amd64' }}
+
+# ダウンロード先 (一時)
+quarto_deb_download_dir: "/tmp"

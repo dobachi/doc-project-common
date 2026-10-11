@@ -1,0 +1,44 @@
+---
+# tasks file for roles/mermaid_cli
+#
+# @mermaid-js/mermaid-cli (mmdc) を npm global で導入する。
+# その他の OS では何もしない (when ガードで skip)。
+
+- block:
+
+    - name: Check that node is available
+      ansible.builtin.command: node --version
+      register: _mermaid_cli_node
+      changed_when: false
+      failed_when: false
+
+    - name: Fail early when node is missing
+      ansible.builtin.fail:
+        msg: >-
+          node が見つからない。mermaid_cli は node/npm を前提にしている。
+          roles/nodejs を先に実行すること
+          (doc_authoring.yml では順に並べてある)。
+      when: _mermaid_cli_node.rc != 0
+
+    # npm install は Chromium が無くても成功してしまう。不足は mmdc の実行時に
+    # 共有ライブラリのエラーとして出るため、先に入れて発現を防ぐ。
+    - name: Install Chromium runtime libraries for the bundled Puppeteer
+      ansible.builtin.apt:
+        name: "{{ mermaid_cli_chromium_packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      when: mermaid_cli_install_chromium_deps | bool
+
+    - name: Install @mermaid-js/mermaid-cli (npm global)
+      community.general.npm:
+        name: "@mermaid-js/mermaid-cli"
+        version: "{{ mermaid_cli_version | default(omit, true) }}"
+        global: true
+        state: present
+
+  tags:
+    - mermaid_cli
+  when: ansible_facts['os_family'] == "Debian"
+
+# vim: set et ts=2 sw=2:
